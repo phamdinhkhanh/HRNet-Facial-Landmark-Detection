@@ -21,7 +21,8 @@ from lib.config import config, update_config
 from lib.datasets import get_dataset
 from lib.core import function
 from lib.utils import utils
-
+import wandb
+import logging
 
 def parse_args():
 
@@ -36,6 +37,9 @@ def parse_args():
 
 
 def main():
+    wandb.init(project="HRNet Facial Landmark Detection")
+    wandb.config.dataset=config.DATASET.DATASET
+    wandb.config.using_wingloss=False
 
     args = parse_args()
 
@@ -114,11 +118,11 @@ def main():
         lr_scheduler.step()
 
         function.train(config, train_loader, model, criterion,
-                       optimizer, epoch, writer_dict)
+                       optimizer, epoch, writer_dict, wandb=wandb)
 
         # evaluate
         nme, predictions = function.validate(config, val_loader, model,
-                                             criterion, epoch, writer_dict)
+                                             criterion, epoch, writer_dict, wandb=wandb)
 
         is_best = nme < best_nme
         best_nme = min(nme, best_nme)

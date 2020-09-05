@@ -85,3 +85,7 @@ def decode_preds(output, center, scale, res):
         preds = preds.view(1, preds.size())
 
     return preds
+
+def get_lr(optimizer):
+    for param_group in optimizer.param_groups:
+        return param_group['lr']

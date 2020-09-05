@@ -13,11 +13,10 @@ import logging
 
 import torch
 import numpy as np
-
-from .evaluation import decode_preds, compute_nme
+import wandb
+from .evaluation import decode_preds, compute_nme, get_lr
 
 logger = logging.getLogger(__name__)
-
 
 class AverageMeter(object):
     """Computes and stores the average and current value"""
@@ -42,8 +41,8 @@ class AverageMeter(object):
 
 
 def train(config, train_loader, model, critertion, optimizer,
-          epoch, writer_dict):
-
+          epoch, writer_dict, wandb = None):
+    wandb.init(project="HRNet Facial Landmark Detection")
     batch_time = AverageMeter()
     data_time = AverageMeter()
     losses = AverageMeter()
@@ -77,6 +76,10 @@ def train(config, train_loader, model, critertion, optimizer,
         loss.backward()
         optimizer.step()
 
+        # learning rate
+        lr = get_lr(optimizer)
+        wandb.log({"metric/learning_rate": lr})
+
         losses.update(loss.item(), inp.size(0))
 
         batch_time.update(time.time()-end)
@@ -96,7 +99,8 @@ def train(config, train_loader, model, critertion, optimizer,
                 global_steps = writer_dict['train_global_steps']
                 writer.add_scalar('train_loss', losses.val, global_steps)
                 writer_dict['train_global_steps'] = global_steps + 1
-
+        wandb.log({"metric/loss": losses.avg})  
+        wandb.log({"metric/nme_loss": nme_batch_sum/nme_count}) 
         end = time.time()
     nme = nme_batch_sum / nme_count
     msg = 'Train Epoch {} time:{:.4f} loss:{:.4f} nme:{:.4f}'\
@@ -104,7 +108,7 @@ def train(config, train_loader, model, critertion, optimizer,
     logger.info(msg)
 
 
-def validate(config, val_loader, model, criterion, epoch, writer_dict):
+def validate(config, val_loader, model, criterion, epoch, writer_dict, wandb = None):
     batch_time = AverageMeter()
     data_time = AverageMeter()
 
@@ -146,7 +150,8 @@ def validate(config, val_loader, model, criterion, epoch, writer_dict):
                 predictions[meta['index'][n], :, :] = preds[n, :, :]
 
             losses.update(loss.item(), inp.size(0))
-
+            wandb.log({'metric/val_loss': losses.val})
+            wandb.log({'metric/val_nme_loss': nme_batch_sum/nme_count})
             # measure elapsed time
             batch_time.update(time.time() - end)
             end = time.time()
