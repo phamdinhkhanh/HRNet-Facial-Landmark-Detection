@@ -112,3 +112,11 @@ hrnetv2_pretrained/
 output
 log
 *.swp
+
+
+# dataset
+data/wflw/images/
+data/wflw/WFLW_annotations/
+
+# hrnetv2_pretrained
+hrnetv2_pretrained/
