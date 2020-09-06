@@ -145,6 +145,7 @@ def main():
 
 
 if __name__ == '__main__':
+    # python3 tools/train.py --cfg experiments/wflw/face_alignment_wflw_hrnet_w18.yaml
     main()
 
 

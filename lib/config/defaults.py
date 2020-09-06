@@ -115,6 +115,10 @@ def update_config(cfg, args):
     cfg.merge_from_file(args.cfg)
     cfg.freeze()
 
+def merge_configs(cfg, cfg2):
+    cfg.defrost()
+    cfg.merge_from_file(cfg2)
+    cfg.freeze()
 
 if __name__ == '__main__':
     import sys

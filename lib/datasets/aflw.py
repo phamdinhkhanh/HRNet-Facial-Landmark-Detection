@@ -98,6 +98,16 @@ class AFLW(data.Dataset):
 
         return img, target, meta
 
+    @staticmethod
+    def _preprocessing(self, img, center, scale):
+        img = crop(img, center, scale, self.input_size, rot=0)
+        img = img.astype(np.float32)
+        # img = (img/255.0 - self.mean) / self.std
+        # img = img.transpose([2, 0, 1])
+        # img = np.expand_dims(img, axis=0)
+        # print(img.shape)
+        img = torch.Tensor(img)
+        return img
 
 if __name__ == '__main__':
 

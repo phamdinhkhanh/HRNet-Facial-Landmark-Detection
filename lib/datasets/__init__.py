@@ -25,3 +25,17 @@ def get_dataset(config):
     else:
         raise NotImplemented()
 
+
+def get_preprocess(config):
+
+    if config.DATASET.DATASET == 'AFLW':
+        return AFLW(config, is_train=False)
+    elif config.DATASET.DATASET == 'COFW':
+        return COFW(config, is_train=False)
+    elif config.DATASET.DATASET == '300W':
+        return Face300W(config, is_train=False)
+    elif config.DATASET.DATASET == 'WFLW':
+        return WFLW(config, is_train=False)
+    else:
+        raise NotImplemented()
+
